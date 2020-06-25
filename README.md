@@ -1,8 +1,8 @@
 # Absolute RNA quantification using ERCC spike-ins
 
-Megan D. Schertzer, [J. Mauro Calabrese](https://www.med.unc.edu/pharm/calabreselab/)
+Megan D. Schertzer, Mckenzie M. Murvin, [J. Mauro Calabrese](https://www.med.unc.edu/pharm/calabreselab/)
 
-This ERCC analysis pipeline for absolute quantification of RNA-seq data is published alongside our [BioProtocols paper]().
+This ERCC analysis pipeline for absolute quantification of RNA-seq data is published alongside our 2020 BioProtocols paper.
 
 ## 1. RNA-Seq Processing (Fastq --> Bam)
 
@@ -26,10 +26,10 @@ These files are located in the github repository or can be download from <https:
 
 **Download genome annotation files for your cell type:**
 
-You need a genome fasta file and a gtf file with gene features and coordinates. MM9 genome files were used in our analysis for the paper and are included in this github repository. Genome files compiled by the UCSC Genome Browser (Haeussler et al., 2019), which can be downloaded from Illumina’s iGenomes site: <https://support.illumina.com/sequencing/sequencing_software/igenome.html>.  
+You need a genome fasta file and a gtf file with gene features and coordinates. MM9 genome files were used in our analysis for the paper. Genome files compiled by the UCSC Genome Browser (Haeussler et al., 2019), which can be downloaded from Illumina’s iGenomes site: <https://support.illumina.com/sequencing/sequencing_software/igenome.html>.  
 
-* mm9_genome.fa 
-* mm9_genes.gtf
+* genome.fa 
+* genes.gtf
 
 ### *This next step is optional* 
 
@@ -50,15 +50,17 @@ fastq-dump SRR7685881
 
 I have the file names that I used for my example file. When processing your own data, substitute the proper names and parameters. If you are on a cluster, these should be submitted as a job (sbatch, qsub, bsub, etc. depending on the platform). These should NOT be run on the login node.
 
-**Build STAR genome that includes ERCC spike-in fasta and gtf:**
+**Create a new directory for the STAR index and build STAR genome that includes ERCC spike-in fasta and gtf:**
 
 ```
+mkdir ./GenomeDir
+
 STAR 
   --runThreadN 8 
   --runMode genomeGenerate 
-  --genomeDir mm9_STAR_ercc 
-  --genomeFastaFiles mm9_genome.fa ERCC92.fa 
-  --sjdbGTFfile mm9_genes.gtf ERCC92.gtf
+  --genomeDir ./GenomeDir 
+  --genomeFastaFiles genome.fa ERCC92.fa 
+  --sjdbGTFfile genes.gtf ERCC92.gtf
 
 ```
 
@@ -67,7 +69,7 @@ STAR
 ```
 STAR 
   --runThreadN 12 
-  --genomeDir mm9_STAR_ercc 
+  --genomeDir ./GenomeDir 
   --readFilesIn SRR7685881.fastq 
   --outFileNamePrefix vprtta_rep2_
   
@@ -106,13 +108,13 @@ featureCounts
 ```
 featureCounts 
   -s 2 
-  -a mm9_genes.gtf 
+  -a genes.gtf 
   -o vprtta_rep2_fc.txt
   vprtta_rep2_q30.bam
   
 ```
   
-## 2. Analyze ERCC and gene featureCount files in either R
+## 2. Analyze ERCC and gene featureCount files in R
 
 * If you would rather use excel, there is also an excel template in the github repository.
 * If you are going to use the R script, keep reading. 
@@ -156,7 +158,7 @@ There are **3 required inputs** for this R script (the order of the inputs matte
 
 -p RNA_PER_CELL_PICOGRAM, --rna_per_cell_picogram=RNA_PER_CELL_PICOGRAM
 
-|       [Default 30] based on the cell type used in our paper. This is the amount of total RNA per cell for your cell type. This is cell type specific and must be calculated for your cell type as described in the paper.  
+  [Default 30] based on the cell type used in our paper. This is the amount of total RNA per cell for your cell type. This is cell type specific and must be calculated for your cell type as described in the paper.  
 &nbsp;
 
 **Additional parameters:**
@@ -165,17 +167,17 @@ Options:
 
 -d DILUTION, --dilution=DILUTION
 
-|       The dilution of ercc spike-ins prepared prior to library prep. [Default 100] is     same as used in paper.  
+  The dilution of ercc spike-ins prepared prior to library prep. [Default 100] is     same as used in paper.  
 &nbsp;
 
 -e ERCC_MICROLITER, --ercc_microliter=ERCC_MICROLITER  
 
-|       Microliter amount of ercc spike-in dilution added to rna before library prep.     [Default 2] is same as used in paper.  
+  Microliter amount of ercc spike-in dilution added to rna before library prep.     [Default 2] is same as used in paper.  
 &nbsp;
 
 -r RNA_MICROGRAM, --rna_microgram=RNA_MICROGRAM  
 
-|       Micrograms of starting total cellular RNA used in library prep. [Default 1] is same as used in paper.  
+  Micrograms of starting total cellular RNA used in library prep. [Default 1] is same as used in paper.  
 &nbsp;
 
 
