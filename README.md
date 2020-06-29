@@ -1,6 +1,6 @@
 # Absolute RNA quantification using ERCC spike-ins
 
-Megan D. Schertzer, Mckenzie M. Murvin, [J. Mauro Calabrese](https://www.med.unc.edu/pharm/calabreselab/)
+Megan D. Schertzer, McKenzie M. Murvin, [J. Mauro Calabrese](https://www.med.unc.edu/pharm/calabreselab/)
 
 This ERCC analysis pipeline for absolute quantification of RNA-seq data is published alongside our 2020 BioProtocols paper.
 
